@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    No Flood Alert
+{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="text-center">
+            <div class="alert alert-success" role="alert">
+                <h1 class="display-4">Everything Seems Fine</h1>
+                <p class="lead">No need of any alert.</p>
+            </div>
+            <form action="/aialerts" method="post" class="mt-5">
+                <button class="btn btn-primary btn-lg" type="submit">Predict with Government Data</button>
+                <button class="btn btn-info btn-lg" type="submit">Predict with Custom Data</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

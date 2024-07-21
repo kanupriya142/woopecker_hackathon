@@ -7,6 +7,7 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from dotenv import load_dotenv
+import forecast as fc
 
 import sqlite3
 
@@ -54,7 +55,7 @@ def create_app():
             db.execute("INSERT INTO commonalerts (calamity,location,description) VALUES (?,?,?)",
                            (c,l,d))
             conn.commit()
-            return "Alert Issued Successfully.",200
+            return render_template("noflood.html"),200
         else:
             return render_template("alerts.html")
 
@@ -102,7 +103,7 @@ def create_app():
             db.execute("INSERT INTO govtalerts (calamity,location,description) VALUES (?,?,?)",
                            (c,l,d))
             conn.commit()
-            return "Alert Issued Successfully.",200
+            return render_template("noflood.html"),200
         else:
             return render_template("govtalerts.html")
 
@@ -116,6 +117,27 @@ def create_app():
             s = {"datetime":w1[1],"location":w1[3],"calamity":w1[2],"description":w1[4]}
             alerts.append(s)
         return jsonify(alerts)
+    
+    @app.route("/aialerts", methods=["GET","POST"])
+
+    def aialerts():
+        if request.method=="POST":
+            data = fc.getData()
+            prob = fc.forecast(data)
+            if prob>0.5:
+                c="Flood"
+                l="Pune"
+                d="Flood Warning! Reach safe places at high grounds ASAP."
+                s = {"success":"yes"}
+                db.execute("INSERT INTO govtalerts (calamity,location,description) VALUES (?,?,?)",
+                           (c,l,d))
+                conn.commit()
+                return render_template("disaster.html")
+            else:
+                return render_template("noflood.html")
+        else:
+            return render_template("aipredict.html")
+
 
     #@app.route("/generateids")
 
@@ -151,3 +173,6 @@ def create_app():
     return app
 
 app = create_app()
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
